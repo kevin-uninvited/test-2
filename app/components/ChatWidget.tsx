@@ -368,7 +368,7 @@ export default function ChatWidget({
                             <div className="flex-1 overflow-hidden transition-all duration-300 ease-in-out">
                                 <div
                                     ref={chatContainerRef}
-                                    className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 scroll-smooth p-4"
+                                    className="h-full overflow-y-auto scroll-smooth p-4 chat-scrollbar"
                                 >
                                     {messages.length === 0 ? (
                                         <div className="h-full"></div>
@@ -379,28 +379,30 @@ export default function ChatWidget({
                                                     key={message.id}
                                                     className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                                                 >
-                                                    <div
-                                                        className={`max-w-[85%] px-3 py-2 rounded-[12px] ${message.role === 'user'
-                                                            ? 'border border-[#EF8143] text-white bg-transparent'
-                                                            : 'bg-[#EF81433B] text-white border border-[#EF8143]'
-                                                            }`}
-                                                    >
-                                                        {message.content || (message.role === 'assistant' && isLoading) ? (
-                                                            message.content ? (
-                                                                <p className="text-sm font-medium whitespace-pre-wrap break-words">
-                                                                    {message.content}
-                                                                </p>
-                                                            ) : (
-                                                                <span className="flex items-center space-x-2">
-                                                                    <span className="flex space-x-1">
-                                                                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce inline-block"></span>
-                                                                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce inline-block" style={{ animationDelay: '0.1s' }}></span>
-                                                                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce inline-block" style={{ animationDelay: '0.2s' }}></span>
+                                                    <div className="flex flex-col max-w-[85%]">
+                                                        <div
+                                                            className={`px-3 py-2 rounded-[12px] ${message.role === 'user'
+                                                                ? 'border border-[#EF8143] text-white bg-transparent'
+                                                                : 'bg-[#EF81433B] text-white border border-[#EF8143]'
+                                                                }`}
+                                                        >
+                                                            {message.content || (message.role === 'assistant' && isLoading) ? (
+                                                                message.content ? (
+                                                                    <p className="text-sm font-medium whitespace-pre-wrap break-words">
+                                                                        {message.content}
+                                                                    </p>
+                                                                ) : (
+                                                                    <span className="flex items-center space-x-2">
+                                                                        <span className="flex space-x-1">
+                                                                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce inline-block"></span>
+                                                                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce inline-block" style={{ animationDelay: '0.1s' }}></span>
+                                                                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce inline-block" style={{ animationDelay: '0.2s' }}></span>
+                                                                        </span>
                                                                     </span>
-                                                                </span>
-                                                            )
-                                                        ) : null}
-                                                        <p className="text-xs mt-1 text-gray-500">
+                                                                )
+                                                            ) : null}
+                                                        </div>
+                                                        <p className="text-xs mt-1 text-gray-500 ml-[4px]">
                                                             {formatTime(message.timestamp)}
                                                         </p>
                                                     </div>
