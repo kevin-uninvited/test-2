@@ -1,39 +1,37 @@
-import ChatWidget from '../components/ChatWidget'
+"use client"
 
-interface WidgetPageProps {
-    searchParams: {
-        brandColor?: string
-        logo?: string
-        welcomeMessage?: string
-        position?: 'bottom-right' | 'bottom-left'
-        showOnScroll?: string
-        showOnInactivity?: string
-        inactivityDelay?: string
+import { Suspense } from "react"
+import { useSearchParams } from "next/navigation"
+import ChatWidget from "../components/ChatWidget"
+
+function EmbedContent() {
+    const searchParams = useSearchParams()
+
+    const props = {
+        brandColor: searchParams.get("brandColor") || "#EF8143",
+        logo: searchParams.get("logo") || undefined,
+        welcomeMessage: searchParams.get("welcomeMessage") || "Hi! How can I help you today?",
+        position: (searchParams.get("position") as "bottom-right" | "bottom-left" | "bottom-center") || "bottom-right",
+        showOnScroll: searchParams.get("showOnScroll") !== "false",
+        showOnInactivity: searchParams.get("showOnInactivity") !== "false",
+        inactivityDelay: Number.parseInt(searchParams.get("inactivityDelay") || "30000"),
+        width: Number.parseInt(searchParams.get("width") || "400"),
+        height: Number.parseInt(searchParams.get("height") || "584"),
+        chatBoxtitle: searchParams.get("chatBoxtitle") || "Ask AI",
+        chatBoxsubTitle: searchParams.get("chatBoxsubTitle") || "powered by OpenAI",
+        chatBoxDescription: searchParams.get("chatBoxDescription") || "Get instant answers to your questions",
+        chatBoxInputPlaceholder: searchParams.get("chatBoxInputPlaceholder") || "Type Your Question Here...",
     }
+
+    return <ChatWidget {...props} />
 }
 
-export default function WidgetPage({ searchParams }: WidgetPageProps) {
-    const {
-        brandColor = '#3B82F6',
-        logo,
-        welcomeMessage = 'Hi! How can I help you today?',
-        position = 'bottom-right',
-        showOnScroll = 'true',
-        showOnInactivity = 'true',
-        inactivityDelay = '30000'
-    } = searchParams
-
+export default function EmbedPage() {
     return (
-        <div className="min-h-screen w-full">
-            <ChatWidget
-                brandColor={brandColor}
-                logo={logo}
-                welcomeMessage={welcomeMessage}
-                position={position as 'bottom-right' | 'bottom-left'}
-                showOnScroll={showOnScroll === 'true'}
-                showOnInactivity={showOnInactivity === 'true'}
-                inactivityDelay={parseInt(inactivityDelay)}
-            />
+        <div className="min-h-screen bg-transparent">
+            <Suspense fallback={<div>Loading...</div>}>
+                <EmbedContent />
+            </Suspense>
         </div>
     )
-} 
+}

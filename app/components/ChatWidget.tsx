@@ -58,34 +58,30 @@ export default function ChatWidget({
     const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null)
     const chatContainerRef = useRef<HTMLDivElement>(null)
 
-    // Position classes for button
     const positionClasses = {
         'bottom-right': 'bottom-4 right-4',
         'bottom-left': 'bottom-4 left-4',
         'bottom-center': 'bottom-4 left-1/2 transform -translate-x-1/2'
     }
 
-    // Chat positioning - updated to handle full view
     const getChatClasses = () => {
         if (isFullView) {
-            return "inset-0" // Full screen
+            return "inset-0"
         }
 
         if (isMobile) {
-            return "inset-4" // Small margin on mobile
+            return "inset-4"
         }
 
-        // Position chat widget above and aligned with the button
         const desktopPositions = {
-            'bottom-right': 'bottom-20 right-4', // Above the button, aligned to right
-            'bottom-left': 'bottom-20 left-4',   // Above the button, aligned to left
-            'bottom-center': 'bottom-20 left-1/2 transform -translate-x-1/2' // Above the button, centered
+            'bottom-right': 'bottom-20 right-4',
+            'bottom-left': 'bottom-20 left-4',
+            'bottom-center': 'bottom-20 left-1/2 transform -translate-x-1/2'
         }
 
         return desktopPositions[position]
     }
 
-    // Auto-scroll to bottom of chat container when new messages are added
     const scrollToBottom = () => {
         if (chatContainerRef.current) {
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
@@ -102,7 +98,6 @@ export default function ChatWidget({
         }
     }, [isOpen])
 
-    // Check if device is mobile
     useEffect(() => {
         const checkMobile = () => {
             setIsMobile(window.innerWidth < 768)
@@ -114,7 +109,6 @@ export default function ChatWidget({
         return () => window.removeEventListener("resize", checkMobile)
     }, [])
 
-    // Handle scroll behavior
     useEffect(() => {
         if (!showOnScroll) return
 
@@ -131,7 +125,6 @@ export default function ChatWidget({
         return () => window.removeEventListener('scroll', handleScroll)
     }, [hasScrolled, showOnScroll])
 
-    // Handle inactivity detection
     useEffect(() => {
         if (!showOnInactivity) return
 
@@ -180,7 +173,6 @@ export default function ChatWidget({
         setInputValue('')
         setIsLoading(true)
 
-        // Create AI message placeholder
         const aiMessageId = (Date.now() + 1).toString()
         const aiMessage: Message = {
             id: aiMessageId,
@@ -242,7 +234,6 @@ export default function ChatWidget({
                     }
                 }
 
-                // If no content was received, show error message
                 if (!assistantContent) {
                     setMessages(prev => prev.map(msg =>
                         msg.id === aiMessageId
@@ -279,14 +270,12 @@ export default function ChatWidget({
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
 
-    // Handle full view toggle
     const toggleFullView = () => {
         setIsFullView(!isFullView)
     }
 
     return (
         <>
-            {/* Message Icon Button - Only show when closed */}
             {!isOpen && (
                 <div className={`fixed ${positionClasses[position]} z-50`}>
                     <button
@@ -303,7 +292,6 @@ export default function ChatWidget({
                 </div>
             )}
 
-            {/* Floating Close Button - Only show when open and not in full view */}
             {isOpen && !isFullView && (
                 <div className={`fixed ${positionClasses[position]} z-[60]`}>
                     <button
@@ -317,7 +305,6 @@ export default function ChatWidget({
                 </div>
             )}
 
-            {/* Chat Widget - Only show when open */}
             {isOpen && (
                 <div
                     className={`fixed ${getChatClasses()} ${isFullView ? 'z-[100]' : 'z-50'}`}
@@ -333,7 +320,6 @@ export default function ChatWidget({
                     }}
                 >
                     <div className="bg-[#151921] rounded-[20px] border border-[#EF8143] shadow-2xl flex flex-col h-full">
-                        {/* Top Header */}
                         <div className="flex items-center justify-between px-4 py-3 border-b border-[#EF8143] flex-shrink-0">
                             <div className="flex items-center">
                                 <button
@@ -363,7 +349,6 @@ export default function ChatWidget({
                                     className="object-contain"
                                 />
                             </div>
-                            {/* Close button in full view mode */}
                             {isFullView ? (
                                 <button
                                     onClick={() => setIsOpen(false)}
@@ -373,13 +358,11 @@ export default function ChatWidget({
                                     <X size={24} className="text-white" />
                                 </button>
                             ) : (
-                                <div className="w-6"></div> // Spacer to balance the layout
+                                <div className="w-6"></div>
                             )}
                         </div>
 
-                        {/* Chat Content */}
                         <div className="flex-1 flex flex-col min-h-0 relative">
-                            {/* Header - only show when no messages, centered in middle */}
                             {messages.length === 0 && (
                                 <div className="absolute inset-0 flex items-center justify-center p-6">
                                     <div className="flex flex-col items-center gap-4 text-center max-w-sm">
@@ -398,7 +381,6 @@ export default function ChatWidget({
                                 </div>
                             )}
 
-                            {/* Messages Container */}
                             <div className="flex-1 overflow-hidden transition-all duration-300 ease-in-out">
                                 <div
                                     ref={chatContainerRef}
@@ -448,7 +430,6 @@ export default function ChatWidget({
                                 </div>
                             </div>
 
-                            {/* Input Form */}
                             <div className="px-4 py-3 border-t border-[#EF8143] flex-shrink-0">
                                 <form onSubmit={handleSubmit}>
                                     <div className="flex items-center gap-3 bg-transparent overflow-hidden">
