@@ -47,8 +47,6 @@ export default function ChatWidget({
     width = 400,
     height = 584,
     chatBoxtitle = "Ask AI",
-    chatBoxsubTitle = "powered by OpenAI",
-    chatBoxDescription = "Get instant answers to your questions",
     chatBoxInputPlaceholder = "Type Your Question Here..."
 }: ChatWidgetProps) {
     const [isOpen, setIsOpen] = useState(false)
@@ -361,7 +359,7 @@ export default function ChatWidget({
                     }}
                 >
                     <div className="bg-[#151921] rounded-[20px] border border-[#EF8143] shadow-2xl flex flex-col h-full">
-                        <div className="flex items-center justify-between px-4 py-3 border-b border-[#EF8143] flex-shrink-0">
+                        <div className="flex items-center justify-between px-4 py-2 border-b border-[#EF8143] flex-shrink-0">
                             <div className="flex items-center">
                                 <button
                                     onClick={toggleFullView}
@@ -369,13 +367,13 @@ export default function ChatWidget({
                                     aria-label={isFullView ? "Exit full view" : "Enter full view"}
                                 >
                                     {isFullView ? (
-                                        <Minimize2 size={24} className="text-white" />
+                                        <Minimize2 size={20} className="text-white" />
                                     ) : (
                                         <Image
                                             src="/fullview.svg"
                                             alt="Full view"
-                                            width={24}
-                                            height={24}
+                                            width={20}
+                                            height={20}
                                             className="text-white"
                                         />
                                     )}
@@ -385,8 +383,8 @@ export default function ChatWidget({
                                 <Image
                                     src="/logo.svg"
                                     alt="Logo"
-                                    width={120}
-                                    height={120}
+                                    width={80}
+                                    height={80}
                                     className="object-contain"
                                 />
                             </div>
@@ -396,7 +394,7 @@ export default function ChatWidget({
                                     className="hover:bg-[#EF8143]/20 rounded-lg p-1 transition-colors"
                                     aria-label="Close chat"
                                 >
-                                    <X size={24} className="text-white" />
+                                    <X size={20} className="text-white" />
                                 </button>
                             ) : (
                                 <div className="w-6"></div>
@@ -429,7 +427,7 @@ export default function ChatWidget({
                                                 </>
                                             ) : chatQuestions.length > 0 ? (
                                                 // Show fetched questions
-                                                chatQuestions.map((question, index) => (
+                                                chatQuestions.map((question) => (
                                                     <button
                                                         key={question._id}
                                                         className={`bg-transparent border border-[#EF8143] text-white px-4 py-2 rounded-lg cursor-pointer text-left hover:bg-[#EF8143]/10 transition-colors duration-200 ${isFullView ? 'md:min-w-[392px] md:max-w-[392px]' : 'md:min-w-[280px] md:max-w-[280px]'}`}

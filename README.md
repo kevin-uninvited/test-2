@@ -10,6 +10,9 @@ A sleek, responsive floating chat widget designed for seamless integration acros
 - **Responsive Design**: Works perfectly on desktop, tablet, and mobile
 - **Easy Integration**: Simple iframe or script tag embedding
 - **Cross-platform**: Compatible with any website or platform
+- **Dynamic Chat Questions**: AI-powered suggested questions from Sanity CMS
+- **Full-View Mode**: Expandable interface for enhanced user experience
+- **Enhanced Customization**: Extensive theming and content customization options
 
 ## Quick Start
 
@@ -21,12 +24,19 @@ Copy the example environment file and configure your API settings:
 cp .env.example .env.local
 ```
 
-Add your NEBUL API credentials to `.env.local`:
+Add your API credentials and Sanity configuration to `.env.local`:
 
 ```env
+# API Configuration
 NEBUL_API_URL=https://api.nebul.ai/v1/chat/completions
 NEBUL_API_KEY=your_nebul_api_key_here
 NEBUL_MODEL=your_model_name_here
+
+# Sanity CMS Configuration (for dynamic questions)
+NEXT_PUBLIC_SANITY_PROJECT_ID=your_sanity_project_id
+NEXT_PUBLIC_SANITY_DATASET=production
+SANITY_API_TOKEN=your_sanity_api_token
+NEXT_PUBLIC_SANITY_API_VERSION=2023-05-03
 ```
 
 ### 2. Install Dependencies
@@ -53,8 +63,10 @@ Add this to your website's HTML:
 <script>
 	window.ChatWidgetConfig = {
 		baseUrl: "https://your-widget-domain.com",
-		brandColor: "#3B82F6",
+		brandColor: "#EF8143",
 		welcomeMessage: "Hi! How can I help you today?",
+		chatBoxtitle: "Ask AI",
+		position: "bottom-right",
 	};
 </script>
 <script src="https://your-widget-domain.com/embed.js"></script>
@@ -66,7 +78,7 @@ Embed the widget directly:
 
 ```html
 <iframe
-	src="https://your-widget-domain.com/widget?brandColor=%233B82F6"
+	src="https://your-widget-domain.com/widget?brandColor=%23EF8143&chatBoxtitle=Ask%20AI"
 	style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 9999; pointer-events: none; background: transparent;"
 ></iframe>
 ```
@@ -75,15 +87,21 @@ Embed the widget directly:
 
 ### Configuration Parameters
 
-| Parameter          | Type    | Default                         | Description                                       |
-| ------------------ | ------- | ------------------------------- | ------------------------------------------------- |
-| `brandColor`       | string  | `#3B82F6`                       | Widget theme color (hex code)                     |
-| `logo`             | string  | `undefined`                     | URL to your company logo                          |
-| `welcomeMessage`   | string  | `Hi! How can I help you today?` | Initial message from assistant                    |
-| `position`         | string  | `bottom-right`                  | Widget position (`bottom-right` or `bottom-left`) |
-| `showOnScroll`     | boolean | `true`                          | Pulse widget when user scrolls                    |
-| `showOnInactivity` | boolean | `true`                          | Pulse widget after inactivity                     |
-| `inactivityDelay`  | number  | `30000`                         | Inactivity delay in milliseconds                  |
+| Parameter                 | Type    | Default                         | Description                                                      |
+| ------------------------- | ------- | ------------------------------- | ---------------------------------------------------------------- |
+| `brandColor`              | string  | `#EF8143`                       | Widget theme color (hex code)                                    |
+| `logo`                    | string  | `undefined`                     | URL to your company logo                                         |
+| `welcomeMessage`          | string  | `Hi! How can I help you today?` | Initial message from assistant                                   |
+| `position`                | string  | `bottom-right`                  | Widget position (`bottom-right`, `bottom-left`, `bottom-center`) |
+| `showOnScroll`            | boolean | `true`                          | Pulse widget when user scrolls                                   |
+| `showOnInactivity`        | boolean | `true`                          | Pulse widget after inactivity                                    |
+| `inactivityDelay`         | number  | `30000`                         | Inactivity delay in milliseconds                                 |
+| `width`                   | number  | `400`                           | Widget width in pixels (desktop)                                 |
+| `height`                  | number  | `584`                           | Widget height in pixels (desktop)                                |
+| `chatBoxtitle`            | string  | `Ask AI`                        | Title displayed in chat header                                   |
+| `chatBoxsubTitle`         | string  | `powered by OpenAI`             | Subtitle displayed in chat header                                |
+| `chatBoxDescription`      | string  | `Get instant answers...`        | Description text in chat interface                               |
+| `chatBoxInputPlaceholder` | string  | `Type Your Question Here...`    | Placeholder text for input field                                 |
 
 ### Example Configurations
 
@@ -95,8 +113,12 @@ window.ChatWidgetConfig = {
 	brandColor: "#FF6B6B",
 	logo: "https://your-store.com/logo.png",
 	welcomeMessage: "Welcome to our store! Need help finding something?",
+	chatBoxtitle: "Shop Assistant",
+	chatBoxsubTitle: "powered by AI",
 	showOnScroll: true,
 	inactivityDelay: 20000,
+	width: 450,
+	height: 600,
 };
 ```
 
@@ -107,9 +129,12 @@ window.ChatWidgetConfig = {
 	baseUrl: "https://your-widget-domain.com",
 	brandColor: "#10B981",
 	welcomeMessage: "Hi! Need help with our platform?",
+	chatBoxtitle: "Support Chat",
 	position: "bottom-left",
 	showOnInactivity: true,
 	inactivityDelay: 45000,
+	chatBoxInputPlaceholder:
+		"Ask about features, pricing, or technical issues...",
 };
 ```
 
@@ -135,45 +160,126 @@ Handles chat message processing with streaming support.
 **Response:**
 Streaming Server-Sent Events with content chunks.
 
+### `/api/chat-questions`
+
+Fetches dynamic chat questions from Sanity CMS.
+
+**Response:**
+
+```json
+[
+	{
+		"_id": "question-id-1",
+		"name": "How do I get started?",
+		"category": "general"
+	},
+	{
+		"_id": "question-id-2",
+		"name": "What are your pricing plans?",
+		"category": "pricing"
+	}
+]
+```
+
 ## File Structure
 
 ```
 ├── app/
-│   ├── api/chat/route.ts          # Chat API endpoint
-│   ├── components/ChatWidget.tsx   # Main widget component
-│   ├── widget/                    # Widget iframe page
+│   ├── api/
+│   │   ├── chat/route.ts              # Chat API endpoint with streaming
+│   │   └── chat-questions/route.ts     # Dynamic questions from Sanity
+│   ├── components/ChatWidget.tsx       # Main widget component
+│   ├── widget/                        # Widget iframe page
 │   │   ├── page.tsx
 │   │   └── layout.tsx
-│   ├── page.tsx                   # Demo/documentation page
+│   ├── page.tsx                       # Demo/documentation page
 │   └── layout.tsx
+├── lib/
+│   └── sanity.ts                      # Sanity CMS client and types
 ├── public/
-│   ├── embed.js                   # Client-side embed script
-│   └── demo.html                  # Standalone demo
-└── .env.example                   # Environment template
+│   ├── embed.js                       # Client-side embed script
+│   ├── demo.html                      # Standalone demo
+│   ├── fullview.svg                   # Full-view mode icon
+│   └── assets/                        # Additional UI assets
+└── .env.example                       # Environment template
 ```
 
-## Widget Behavior
+## Widget Features
 
 ### Smart Triggers
 
 - **Scroll Detection**: Widget pulses when user scrolls past 100px
 - **Inactivity Detection**: Widget pulses after specified delay without user interaction
-- **Responsive Design**: Adapts to different screen sizes
+- **Responsive Design**: Adapts to different screen sizes automatically
 - **Cross-browser**: Compatible with modern browsers
 
-### Visual States
+### Visual States & Modes
 
 - **Closed**: Floating button in corner
-- **Open**: Full chat interface
-- **Minimized**: Small icon when minimized by user
-- **Pulsing**: Attention-grabbing animation
+- **Open**: Full chat interface with suggested questions
+- **Full-View Mode**: Expandable to full-screen for better experience
+- **Minimized**: Compact icon when minimized by user
+- **Pulsing**: Attention-grabbing animation for engagement
+
+### Dynamic Features
+
+- **Suggested Questions**: Dynamically loaded from Sanity CMS
+- **Real-time Streaming**: Live response streaming for natural conversation
+- **Mobile Optimization**: Adaptive layout for mobile devices
+- **Customizable Themes**: Extensive branding and styling options
+
+## Sanity CMS Integration
+
+### Setup
+
+1. Create a Sanity project at [sanity.io](https://sanity.io)
+2. Define a `chatWidgetQuestionsType` schema with fields:
+   - `name` (string): The question text
+   - `category` (string): Question category
+3. Add your Sanity credentials to `.env.local`
+
+### Schema Example
+
+```javascript
+export default {
+	name: "chatWidgetQuestionsType",
+	title: "Chat Widget Questions",
+	type: "document",
+	fields: [
+		{
+			name: "name",
+			title: "Question",
+			type: "string",
+			validation: (Rule) => Rule.required(),
+		},
+		{
+			name: "category",
+			title: "Category",
+			type: "string",
+			options: {
+				list: [
+					{ title: "General", value: "general" },
+					{ title: "Pricing", value: "pricing" },
+					{ title: "Support", value: "support" },
+				],
+			},
+		},
+	],
+};
+```
 
 ## Deployment
 
 ### Vercel (Recommended)
 
 1. Connect your repository to Vercel
-2. Add environment variables in Vercel dashboard
+2. Add environment variables in Vercel dashboard:
+   - `NEBUL_API_URL`
+   - `NEBUL_API_KEY`
+   - `NEBUL_MODEL`
+   - `NEXT_PUBLIC_SANITY_PROJECT_ID`
+   - `NEXT_PUBLIC_SANITY_DATASET`
+   - `SANITY_API_TOKEN`
 3. Deploy automatically on push
 
 ### Docker
@@ -193,9 +299,18 @@ CMD ["npm", "start"]
 
 Ensure these are set in your production environment:
 
+**Required:**
+
 - `NEBUL_API_URL`
 - `NEBUL_API_KEY`
 - `NEBUL_MODEL`
+
+**Optional (for dynamic questions):**
+
+- `NEXT_PUBLIC_SANITY_PROJECT_ID`
+- `NEXT_PUBLIC_SANITY_DATASET`
+- `SANITY_API_TOKEN`
+- `NEXT_PUBLIC_SANITY_API_VERSION`
 
 ## Testing
 
@@ -204,6 +319,8 @@ Test the widget on different sites:
 1. Visit `/demo.html` for a standalone demo
 2. Use browser dev tools to test responsive behavior
 3. Test iframe integration on external sites
+4. Verify full-view mode functionality
+5. Test dynamic question loading
 
 ## Browser Support
 
@@ -218,6 +335,7 @@ Test the widget on different sites:
 - CORS configured for iframe embedding
 - Content Security Policy friendly
 - No client-side API key exposure
+- Sanity tokens secured server-side
 
 ## Contributing
 
