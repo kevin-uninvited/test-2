@@ -14,15 +14,41 @@ export default function DemoPage() {
   }, [])
 
   const handleCopyBasic = async () => {
-    await navigator.clipboard.writeText(embedCode)
-    setCopiedBasic(true)
-    setTimeout(() => setCopiedBasic(false), 2000)
+    try {
+      await navigator.clipboard.writeText(embedCode);
+      setCopiedBasic(true);
+      setTimeout(() => setCopiedBasic(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+      // Fallback method
+      const textArea = document.createElement('textarea');
+      textArea.value = embedCode;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopiedBasic(true);
+      setTimeout(() => setCopiedBasic(false), 2000);
+    }
   }
 
   const handleCopyCustom = async () => {
-    await navigator.clipboard.writeText(customEmbedCode)
-    setCopiedCustom(true)
-    setTimeout(() => setCopiedCustom(false), 2000)
+    try {
+      await navigator.clipboard.writeText(customEmbedCode);
+      setCopiedCustom(true);
+      setTimeout(() => setCopiedCustom(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+      // Fallback method
+      const textArea = document.createElement('textarea');
+      textArea.value = customEmbedCode;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopiedCustom(true);
+      setTimeout(() => setCopiedCustom(false), 2000);
+    }
   }
 
   const embedCode = `<iframe 
@@ -84,6 +110,7 @@ export default function DemoPage() {
                 ? 'bg-green-500/90 text-white shadow-lg'
                 : 'bg-[#EF8143] text-black hover:bg-[#E5723A] shadow-md hover:shadow-lg'
                 }`}
+              style={{ position: 'relative', zIndex: 10000, cursor: 'pointer' }}
             >
               {copiedBasic ? (
                 <>
@@ -121,6 +148,7 @@ export default function DemoPage() {
                 ? 'bg-green-500/90 text-white shadow-lg'
                 : 'bg-white text-black hover:bg-gray-100 shadow-md hover:shadow-lg'
                 }`}
+              style={{ position: 'relative', zIndex: 10000, cursor: 'pointer' }}
             >
               {copiedCustom ? (
                 <>
@@ -283,23 +311,22 @@ export default function DemoPage() {
       </div>
 
       {/* The actual chat widget for demo */}
-      <iframe
-        src={`${currentOrigin}/widget`}
-        width="100%"
-        height="100%"
-        frameBorder="0"
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          zIndex: 9999,
-          background: 'transparent',
-          border: 'none',
-        }}
-        allow="microphone; camera"
-      />
+      <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 9998, width: '80px', height: '80px', pointerEvents: 'none' }}>
+        <iframe
+          src={`${currentOrigin}/widget`}
+          width="100%"
+          height="100%"
+          frameBorder="0"
+          style={{
+            width: '100%',
+            height: '100%',
+            pointerEvents: 'auto',
+            background: 'transparent',
+            border: 'none',
+          }}
+          allow="microphone; camera"
+        />
+      </div>
 
       <style jsx>{`
         .animate-fade-in-up {
