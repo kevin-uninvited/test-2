@@ -406,9 +406,10 @@ export default function ChatWidget({
                                 <div className="absolute inset-0 flex items-center justify-center p-6 pb-20">
                                     <div className="flex flex-col items-center gap-4 text-center max-w-sm">
                                         <Image src="/message.svg" alt="Logo" width={40} height={40} className="object-contain" />
-                                        <h1 className="font-sans text-center">
+                                        <h1 className="font-sans text-center relative">
                                             <span className="block text-[#EF8143] font-bold text-2xl md:text-4xl mb-2">
                                                 {chatBoxtitle}
+                                                <span className="absolute -top-1 -right-12 text-xs font-medium bg-[#EF8143]/20 text-[#EF8143] px-1.5 py-0.5 rounded">beta</span>
                                             </span>
                                         </h1>
                                         <div className="flex flex-col items-center gap-2">
