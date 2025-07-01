@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
-import { MessageCircle, X, Send, SendIcon } from 'lucide-react'
+import { X, Minimize2 } from 'lucide-react'
 import { IoChatbubblesOutline } from "react-icons/io5";
 import { GrSend } from "react-icons/gr";
 import Image from 'next/image'
@@ -46,6 +46,7 @@ export default function ChatWidget({
 }: ChatWidgetProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [isMobile, setIsMobile] = useState(false)
+    const [isFullView, setIsFullView] = useState(false)
     const [messages, setMessages] = useState<Message[]>([])
     const [inputValue, setInputValue] = useState('')
     const [isLoading, setIsLoading] = useState(false)
@@ -64,8 +65,12 @@ export default function ChatWidget({
         'bottom-center': 'bottom-4 left-1/2 transform -translate-x-1/2'
     }
 
-    // Chat positioning - fixed to align properly with button
+    // Chat positioning - updated to handle full view
     const getChatClasses = () => {
+        if (isFullView) {
+            return "inset-0" // Full screen
+        }
+
         if (isMobile) {
             return "inset-4" // Small margin on mobile
         }
@@ -274,6 +279,11 @@ export default function ChatWidget({
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
 
+    // Handle full view toggle
+    const toggleFullView = () => {
+        setIsFullView(!isFullView)
+    }
+
     return (
         <>
             {/* Message Icon Button - Only show when closed */}
@@ -293,8 +303,8 @@ export default function ChatWidget({
                 </div>
             )}
 
-            {/* Floating Close Button - Only show when open */}
-            {isOpen && (
+            {/* Floating Close Button - Only show when open and not in full view */}
+            {isOpen && !isFullView && (
                 <div className={`fixed ${positionClasses[position]} z-[60]`}>
                     <button
                         onClick={() => setIsOpen(false)}
@@ -310,8 +320,11 @@ export default function ChatWidget({
             {/* Chat Widget - Only show when open */}
             {isOpen && (
                 <div
-                    className={`fixed ${getChatClasses()} z-50`}
-                    style={isMobile ? {
+                    className={`fixed ${getChatClasses()} ${isFullView ? 'z-[100]' : 'z-50'}`}
+                    style={isFullView ? {
+                        width: '100vw',
+                        height: '100vh'
+                    } : isMobile ? {
                         width: 'calc(100vw - 2rem)',
                         height: 'calc(92vh - 2rem)'
                     } : {
@@ -323,24 +336,45 @@ export default function ChatWidget({
                         {/* Top Header */}
                         <div className="flex items-center justify-between px-4 py-3 border-b border-[#EF8143] flex-shrink-0">
                             <div className="flex items-center">
-                                <Image
-                                    src="/fullview.svg"
-                                    alt="Full view"
-                                    width={24}
-                                    height={24}
-                                    className="text-white"
-                                />
+                                <button
+                                    onClick={toggleFullView}
+                                    className="hover:bg-[#EF8143]/20 rounded-lg p-1 transition-colors"
+                                    aria-label={isFullView ? "Exit full view" : "Enter full view"}
+                                >
+                                    {isFullView ? (
+                                        <Minimize2 size={24} className="text-white" />
+                                    ) : (
+                                        <Image
+                                            src="/fullview.svg"
+                                            alt="Full view"
+                                            width={24}
+                                            height={24}
+                                            className="text-white"
+                                        />
+                                    )}
+                                </button>
                             </div>
                             <div className="flex-1 flex justify-center">
                                 <Image
-                                    src="/logo.png"
+                                    src="/logo.svg"
                                     alt="Logo"
-                                    width={40}
-                                    height={40}
+                                    width={120}
+                                    height={120}
                                     className="object-contain"
                                 />
                             </div>
-                            <div className="w-6"></div> {/* Spacer to balance the layout */}
+                            {/* Close button in full view mode */}
+                            {isFullView ? (
+                                <button
+                                    onClick={() => setIsOpen(false)}
+                                    className="hover:bg-[#EF8143]/20 rounded-lg p-1 transition-colors"
+                                    aria-label="Close chat"
+                                >
+                                    <X size={24} className="text-white" />
+                                </button>
+                            ) : (
+                                <div className="w-6"></div> // Spacer to balance the layout
+                            )}
                         </div>
 
                         {/* Chat Content */}
