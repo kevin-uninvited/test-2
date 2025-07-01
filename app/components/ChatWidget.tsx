@@ -13,6 +13,15 @@ interface Message {
     timestamp: Date
 }
 
+interface ChatQuestion {
+    _id: string
+    _type: string
+    name: string
+    category: string
+    _createdAt: string
+    _updatedAt: string
+}
+
 interface ChatWidgetProps {
     brandColor?: string
     logo?: string
@@ -50,6 +59,8 @@ export default function ChatWidget({
     const [isLoading, setIsLoading] = useState(false)
     const [hasScrolled, setHasScrolled] = useState(false)
     const [showPulse, setShowPulse] = useState(false)
+    const [chatQuestions, setChatQuestions] = useState<ChatQuestion[]>([])
+    const [questionsLoading, setQuestionsLoading] = useState(true)
 
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
@@ -284,14 +295,25 @@ export default function ChatWidget({
         setIsFullView(!isFullView)
     }
 
+    const fetchChatQuestions = async () => {
+        try {
+            const response = await fetch('/api/chat-questions')
+            if (response.ok) {
+                const data = await response.json()
+                setChatQuestions(data)
+            } else {
+                console.error('Failed to fetch chat questions')
+            }
+        } catch (error) {
+            console.error('Error fetching chat questions:', error)
+        } finally {
+            setQuestionsLoading(false)
+        }
+    }
 
-    const chatQuetions = [
-        "What is Consciousness?",
-        "Is the universe infinite?",
-        "What is the nature of time?",
-        "What is the meaning of life?",
-
-    ]
+    useEffect(() => {
+        fetchChatQuestions()
+    }, [])
 
     return (
         <>
@@ -391,11 +413,53 @@ export default function ChatWidget({
                                             </span>
                                         </h1>
                                         <div className="flex flex-col items-center gap-2">
-                                            {chatQuetions.map((question, index) => (
-                                                <button key={index} className={`bg-transparent border border-[#EF8143] text-white px-4 py-2 rounded-lg cursor-pointer text-left ${isFullView ? 'md:min-w-[392px] md:max-w-[392px]' : 'md:min-w-[280px] md:max-w-[280px]'}`} onClick={() => handleQuestionClick(question)}>
-                                                    {question}
-                                                </button>
-                                            ))}
+                                            {questionsLoading ? (
+                                                // Loading state
+                                                <>
+                                                    <div className={`bg-transparent border border-[#EF8143] text-white px-4 py-2 rounded-lg ${isFullView ? 'md:min-w-[392px] md:max-w-[392px]' : 'md:min-w-[280px] md:max-w-[280px]'} animate-pulse`}>
+                                                        <div className="h-4 bg-gray-600 rounded"></div>
+                                                    </div>
+                                                    <div className={`bg-transparent border border-[#EF8143] text-white px-4 py-2 rounded-lg ${isFullView ? 'md:min-w-[392px] md:max-w-[392px]' : 'md:min-w-[280px] md:max-w-[280px]'} animate-pulse`}>
+                                                        <div className="h-4 bg-gray-600 rounded"></div>
+                                                    </div>
+                                                    <div className={`bg-transparent border border-[#EF8143] text-white px-4 py-2 rounded-lg ${isFullView ? 'md:min-w-[392px] md:max-w-[392px]' : 'md:min-w-[280px] md:max-w-[280px]'} animate-pulse`}>
+                                                        <div className="h-4 bg-gray-600 rounded"></div>
+                                                    </div>
+                                                </>
+                                            ) : chatQuestions.length > 0 ? (
+                                                // Show fetched questions
+                                                chatQuestions.map((question, index) => (
+                                                    <button
+                                                        key={question._id}
+                                                        className={`bg-transparent border border-[#EF8143] text-white px-4 py-2 rounded-lg cursor-pointer text-left hover:bg-[#EF8143]/10 transition-colors duration-200 ${isFullView ? 'md:min-w-[392px] md:max-w-[392px]' : 'md:min-w-[280px] md:max-w-[280px]'}`}
+                                                        onClick={() => handleQuestionClick(question.name)}
+                                                    >
+                                                        {question.name}
+                                                    </button>
+                                                ))
+                                            ) : (
+                                                // Fallback questions if API fails
+                                                <>
+                                                    <button
+                                                        className={`bg-transparent border border-[#EF8143] text-white px-4 py-2 rounded-lg cursor-pointer text-left hover:bg-[#EF8143]/10 transition-colors duration-200 ${isFullView ? 'md:min-w-[392px] md:max-w-[392px]' : 'md:min-w-[280px] md:max-w-[280px]'}`}
+                                                        onClick={() => handleQuestionClick("What is Consciousness?")}
+                                                    >
+                                                        What is Consciousness?
+                                                    </button>
+                                                    <button
+                                                        className={`bg-transparent border border-[#EF8143] text-white px-4 py-2 rounded-lg cursor-pointer text-left hover:bg-[#EF8143]/10 transition-colors duration-200 ${isFullView ? 'md:min-w-[392px] md:max-w-[392px]' : 'md:min-w-[280px] md:max-w-[280px]'}`}
+                                                        onClick={() => handleQuestionClick("Is the universe infinite?")}
+                                                    >
+                                                        Is the universe infinite?
+                                                    </button>
+                                                    <button
+                                                        className={`bg-transparent border border-[#EF8143] text-white px-4 py-2 rounded-lg cursor-pointer text-left hover:bg-[#EF8143]/10 transition-colors duration-200 ${isFullView ? 'md:min-w-[392px] md:max-w-[392px]' : 'md:min-w-[280px] md:max-w-[280px]'}`}
+                                                        onClick={() => handleQuestionClick("What is the nature of time?")}
+                                                    >
+                                                        What is the nature of time?
+                                                    </button>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
