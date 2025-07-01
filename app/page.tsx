@@ -284,7 +284,7 @@ export default function DemoPage() {
 
       {/* The actual chat widget for demo */}
       <iframe
-        src='http://localhost:3000/widget'
+        src={`${currentOrigin}/widget`}
         width="100%"
         height="100%"
         frameBorder="0"
@@ -297,7 +297,6 @@ export default function DemoPage() {
           zIndex: 9999,
           background: 'transparent',
           border: 'none',
-          pointerEvents: 'none',
         }}
         allow="microphone; camera"
       />

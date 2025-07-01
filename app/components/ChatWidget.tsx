@@ -157,12 +157,19 @@ export default function ChatWidget({
         }
     }, [showOnInactivity, inactivityDelay, isOpen])
 
-    const sendMessage = async () => {
-        if (!inputValue.trim() || isLoading) return
+    const handleQuestionClick = (question: string) => {
+        setInputValue(question)
+        setTimeout(() => {
+            sendMessageWithText(question)
+        }, 500)
+    }
+
+    const sendMessageWithText = async (messageText: string) => {
+        if (!messageText.trim() || isLoading) return
 
         const userMessage: Message = {
             id: Date.now().toString(),
-            content: inputValue.trim(),
+            content: messageText.trim(),
             role: 'user',
             timestamp: new Date()
         }
@@ -252,6 +259,11 @@ export default function ChatWidget({
         }
     }
 
+    const sendMessage = async () => {
+        if (!inputValue.trim() || isLoading) return
+        await sendMessageWithText(inputValue.trim())
+    }
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         sendMessage()
@@ -271,6 +283,15 @@ export default function ChatWidget({
     const toggleFullView = () => {
         setIsFullView(!isFullView)
     }
+
+
+    const chatQuetions = [
+        "What is Consciousness?",
+        "Is the universe infinite?",
+        "What is the nature of time?",
+        "What is the meaning of life?",
+
+    ]
 
     return (
         <>
@@ -368,13 +389,14 @@ export default function ChatWidget({
                                             <span className="block text-[#EF8143] font-bold text-2xl md:text-4xl mb-2">
                                                 {chatBoxtitle}
                                             </span>
-                                            <span className="font-bold text-black text-base md:text-xl">
-                                                ({chatBoxsubTitle})
-                                            </span>
                                         </h1>
-                                        <h2 className="text-base md:text-xl font-bold text-center tracking-[0.28px] leading-[24px] text-black px-4">
-                                            {chatBoxDescription}
-                                        </h2>
+                                        <div className="flex flex-col items-center gap-2">
+                                            {chatQuetions.map((question, index) => (
+                                                <button key={index} className={`bg-transparent border border-[#EF8143] text-white px-4 py-2 rounded-lg cursor-pointer text-left ${isFullView ? 'md:min-w-[392px] md:max-w-[392px]' : 'md:min-w-[280px] md:max-w-[280px]'}`} onClick={() => handleQuestionClick(question)}>
+                                                    {question}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             )}
