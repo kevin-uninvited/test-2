@@ -405,8 +405,9 @@ export default function ChatWidget({
 
                         <div className="flex-1 flex flex-col min-h-0 relative">
                             {messages.length === 0 && (
-                                <div className="absolute inset-0 flex items-center justify-center p-6">
+                                <div className="absolute inset-0 flex items-center justify-center p-6 pb-20">
                                     <div className="flex flex-col items-center gap-4 text-center max-w-sm">
+                                        <Image src="/message.svg" alt="Logo" width={40} height={40} className="object-contain" />
                                         <h1 className="font-sans text-center">
                                             <span className="block text-[#EF8143] font-bold text-2xl md:text-4xl mb-2">
                                                 {chatBoxtitle}
@@ -437,35 +438,13 @@ export default function ChatWidget({
                                                         {question.name}
                                                     </button>
                                                 ))
-                                            ) : (
-                                                // Fallback questions if API fails
-                                                <>
-                                                    <button
-                                                        className={`bg-transparent border border-[#EF8143] text-white px-4 py-2 rounded-lg cursor-pointer text-left hover:bg-[#EF8143]/10 transition-colors duration-200 ${isFullView ? 'md:min-w-[392px] md:max-w-[392px]' : 'md:min-w-[280px] md:max-w-[280px]'}`}
-                                                        onClick={() => handleQuestionClick("What is Consciousness?")}
-                                                    >
-                                                        What is Consciousness?
-                                                    </button>
-                                                    <button
-                                                        className={`bg-transparent border border-[#EF8143] text-white px-4 py-2 rounded-lg cursor-pointer text-left hover:bg-[#EF8143]/10 transition-colors duration-200 ${isFullView ? 'md:min-w-[392px] md:max-w-[392px]' : 'md:min-w-[280px] md:max-w-[280px]'}`}
-                                                        onClick={() => handleQuestionClick("Is the universe infinite?")}
-                                                    >
-                                                        Is the universe infinite?
-                                                    </button>
-                                                    <button
-                                                        className={`bg-transparent border border-[#EF8143] text-white px-4 py-2 rounded-lg cursor-pointer text-left hover:bg-[#EF8143]/10 transition-colors duration-200 ${isFullView ? 'md:min-w-[392px] md:max-w-[392px]' : 'md:min-w-[280px] md:max-w-[280px]'}`}
-                                                        onClick={() => handleQuestionClick("What is the nature of time?")}
-                                                    >
-                                                        What is the nature of time?
-                                                    </button>
-                                                </>
-                                            )}
+                                            ) : null}
                                         </div>
                                     </div>
                                 </div>
                             )}
 
-                            <div className="flex-1 overflow-hidden transition-all duration-300 ease-in-out">
+                            <div className="flex-1 overflow-hidden transition-all duration-300 ease-in-out min-h-0">
                                 <div
                                     ref={chatContainerRef}
                                     className="h-full overflow-y-auto scroll-smooth p-4 chat-scrollbar"
@@ -473,7 +452,7 @@ export default function ChatWidget({
                                     {messages.length === 0 ? (
                                         <div className="h-full"></div>
                                     ) : (
-                                        <div className="space-y-3">
+                                        <div className="space-y-3 pb-4">
                                             {messages.map((message) => (
                                                 <div
                                                     key={message.id}
@@ -514,7 +493,7 @@ export default function ChatWidget({
                                 </div>
                             </div>
 
-                            <div className="px-4 py-3 border-t border-[#EF8143] flex-shrink-0">
+                            <div className="px-4 py-3 border-t border-[#EF8143] flex-shrink-0 bg-[#151921] rounded-b-[20px]">
                                 <form onSubmit={handleSubmit}>
                                     <div className="flex items-center gap-3 bg-transparent overflow-hidden">
                                         <input
@@ -529,7 +508,7 @@ export default function ChatWidget({
                                         />
                                         <button
                                             type="submit"
-                                            className="w-11 h-11 rounded-full bg-[#ef8143] hover:bg-[#ef8143]/90 flex items-center justify-center"
+                                            className="w-11 h-11 rounded-full bg-[#ef8143] hover:bg-[#ef8143]/90 flex items-center justify-center flex-shrink-0"
                                             disabled={isLoading || !inputValue.trim()}
                                         >
                                             <GrSend className="text-xl text-black" />
