@@ -1,4 +1,4 @@
-# Universal Chat Widget
+# CTT Chat Widget
 
 A sleek, responsive floating chat widget designed for seamless integration across multiple websites. The widget is hosted centrally and embedded into client sites via iframe, requiring no complex setup.
 
