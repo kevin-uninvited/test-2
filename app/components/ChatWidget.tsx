@@ -31,8 +31,6 @@ interface ChatWidgetProps {
 
 export default function ChatWidget({
     brandColor = '#EF8143',
-    logo,
-    welcomeMessage = "Hi! How can I help you today?",
     position = 'bottom-right',
     showOnScroll = true,
     showOnInactivity = true,
