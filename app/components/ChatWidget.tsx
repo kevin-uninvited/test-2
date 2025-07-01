@@ -319,7 +319,7 @@ export default function ChatWidget({
                         height: `${height}px`
                     }}
                 >
-                    <div className="bg-[#151921cc] rounded-[20px] border border-[#EF8143] shadow-2xl flex flex-col h-full">
+                    <div className="bg-[#151921] rounded-[20px] border border-[#EF8143] shadow-2xl flex flex-col h-full">
                         {/* Top Header */}
                         <div className="flex items-center justify-between px-4 py-3 border-b border-[#EF8143] flex-shrink-0">
                             <div className="flex items-center">
@@ -381,8 +381,8 @@ export default function ChatWidget({
                                                 >
                                                     <div
                                                         className={`max-w-[85%] px-3 py-2 rounded-[12px] ${message.role === 'user'
-                                                            ? 'border border-black text-black bg-white'
-                                                            : 'bg-[#E3DFD6] text-black border border-gray-200'
+                                                            ? 'border border-[#EF8143] text-white bg-transparent'
+                                                            : 'bg-[#EF81433B] text-white border border-[#EF8143]'
                                                             }`}
                                                     >
                                                         {message.content || (message.role === 'assistant' && isLoading) ? (
