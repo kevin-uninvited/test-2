@@ -24,6 +24,16 @@ interface ChatQuestion {
     _updatedAt: string
 }
 
+interface AskAIPageType {
+    _id: string
+    _type: string
+    chatBoxtitle: string
+    chatBoxsubTitle: string
+    chatBoxDescription: string
+    chatBoxInputPlaceholder: string
+    title: string
+}
+
 interface ChatWidgetProps {
     brandColor?: string
     logo?: string
@@ -34,10 +44,6 @@ interface ChatWidgetProps {
     inactivityDelay?: number
     width?: number
     height?: number
-    chatBoxtitle?: string
-    chatBoxsubTitle?: string
-    chatBoxDescription?: string
-    chatBoxInputPlaceholder?: string
 }
 
 export default function ChatWidget({
@@ -48,8 +54,6 @@ export default function ChatWidget({
     inactivityDelay = 30000,
     width = 400,
     height = 584,
-    chatBoxtitle = "Ask AI",
-    chatBoxInputPlaceholder = "Type your message....."
 }: ChatWidgetProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [isMobile, setIsMobile] = useState(false)
@@ -61,6 +65,8 @@ export default function ChatWidget({
     const [showPulse, setShowPulse] = useState(false)
     const [chatQuestions, setChatQuestions] = useState<ChatQuestion[]>([])
     const [questionsLoading, setQuestionsLoading] = useState(true)
+    const [askAIData, setAskAIData] = useState<AskAIPageType | null>(null)
+    const [askAIDataLoading, setAskAIDataLoading] = useState(true)
 
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
@@ -311,8 +317,26 @@ export default function ChatWidget({
         }
     }
 
+    const fetchAskAIData = async () => {
+        setAskAIDataLoading(true)
+        try {
+            const response = await fetch('/api/ask-ai-data')
+            if (response.ok) {
+                const data = await response.json()
+                setAskAIData(data)
+            } else {
+                console.error('Failed to fetch Ask AI data')
+            }
+        } catch (error) {
+            console.error('Error fetching Ask AI data:', error)
+        } finally {
+            setAskAIDataLoading(false)
+        }
+    }
+
     useEffect(() => {
         fetchChatQuestions()
+        fetchAskAIData()
     }, [])
 
     return (
@@ -330,7 +354,13 @@ export default function ChatWidget({
                             <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full"></div>
                         )}
                     </button>
-                    <div className="text-center mt-2 font-medium text-sm text-white">Ask AI</div>
+                    <div className="text-center mt-2 font-medium text-sm text-white">
+                        {askAIDataLoading ? (
+                            <div className="h-4 bg-gray-600 rounded w-16 mx-auto animate-pulse"></div>
+                        ) : (
+                            askAIData?.chatBoxtitle
+                        )}
+                    </div>
                 </div>
             )}
 
@@ -344,7 +374,13 @@ export default function ChatWidget({
                     >
                         <X size={24} />
                     </button>
-                    <div className="text-center mt-2 font-medium text-sm text-white">Ask AI</div>
+                    <div className="text-center mt-2 font-medium text-sm text-white">
+                        {askAIDataLoading ? (
+                            <div className="h-4 bg-gray-600 rounded w-16 mx-auto animate-pulse"></div>
+                        ) : (
+                            askAIData?.chatBoxtitle
+                        )}
+                    </div>
                 </div>
             )}
 
@@ -411,10 +447,17 @@ export default function ChatWidget({
                                     <div className="flex flex-col items-center gap-4 text-center max-w-sm">
                                         <Image src="/message.svg" alt="Logo" width={50} height={50} className="object-contain" />
                                         <h1 className="font-sans text-center relative">
-                                            <span className="block text-[#EF8143] font-bold text-[60px] md:text-4xl mb-2">
-                                                {chatBoxtitle}
-                                                <span className="absolute -top-1 -right-12 text-xs font-medium bg-[#EF8143]/20 text-[#EF8143] px-1.5 py-0.5 rounded">beta</span>
-                                            </span>
+                                            {askAIDataLoading ? (
+                                                <div className="flex flex-col items-center">
+                                                    <div className="h-10 bg-gray-600 rounded w-32 animate-pulse mb-2"></div>
+                                                    <div className="h-4 bg-gray-600 rounded w-10 absolute -top-1 -right-12 animate-pulse"></div>
+                                                </div>
+                                            ) : (
+                                                <span className="block text-[#EF8143] font-bold text-[60px] md:text-4xl mb-2">
+                                                    {askAIData?.chatBoxtitle}
+                                                    <span className="absolute -top-1 -right-12 text-xs font-medium bg-[#EF8143]/20 text-[#EF8143] px-1.5 py-0.5 rounded">{askAIData?.chatBoxsubTitle}</span>
+                                                </span>
+                                            )}
                                         </h1>
                                         <div className="flex flex-col items-center gap-2">
                                             {questionsLoading ? (
@@ -545,7 +588,7 @@ export default function ChatWidget({
                                         <input
                                             ref={inputRef}
                                             className="bg-transparent border-none h-[40px] pl-4 text-sm font-bold placeholder:text-white flex-1 text-white focus:outline-none"
-                                            placeholder={chatBoxInputPlaceholder}
+                                            placeholder={askAIDataLoading ? "Loading..." : askAIData?.chatBoxInputPlaceholder}
                                             value={inputValue}
                                             onChange={(e) => setInputValue(e.target.value)}
                                             onKeyDown={handleKeyDown}
