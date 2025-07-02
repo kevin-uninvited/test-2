@@ -3,7 +3,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useRef, useEffect } from 'react'
 import { X, Minimize2 } from 'lucide-react'
-import { IoChatbubblesOutline } from "react-icons/io5";
 import { GrSend } from "react-icons/gr";
 import Image from 'next/image'
 import ReactMarkdown from 'react-markdown'
@@ -540,7 +539,7 @@ export default function ChatWidget({
                                 </div>
                             </div>
 
-                            <div className="px-4 py-3 border-t border-[#EF8143] flex-shrink-0 bg-[#151921] rounded-b-[20px]">
+                            <div className="px-4 py-3 bg-transparent border-t border-[#EF8143] flex-shrink-0 bg-[#151921] rounded-b-[20px]">
                                 <form onSubmit={handleSubmit}>
                                     <div className="flex items-center gap-3 bg-transparent overflow-hidden">
                                         <input
