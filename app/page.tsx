@@ -311,22 +311,23 @@ export default function DemoPage() {
       </div>
 
       {/* The actual chat widget for demo */}
-      <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 9998, width: '80px', height: '80px', pointerEvents: 'none' }}>
-        <iframe
-          src={`${currentOrigin}/widget`}
-          width="100%"
-          height="100%"
-          frameBorder="0"
-          style={{
-            width: '100%',
-            height: '100%',
-            pointerEvents: 'auto',
-            background: 'transparent',
-            border: 'none',
-          }}
-          allow="microphone; camera"
-        />
-      </div>
+      <iframe
+        src={`${currentOrigin}/widget`}
+        width="100%"
+        height="100%"
+        frameBorder="0"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: 9999,
+          background: 'transparent',
+          border: 'none',
+        }}
+        allow="microphone; camera"
+      />
 
       <style jsx>{`
         .animate-fade-in-up {

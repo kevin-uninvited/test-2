@@ -45,3 +45,37 @@ iframe {
 iframe[style*="pointer-events: none"] * {
 	pointer-events: auto;
 }
+
+/* Markdown content styles */
+.markdown-content {
+	word-break: break-word;
+}
+
+.markdown-content pre {
+	overflow-x: auto;
+}
+
+.markdown-content code {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+		"Liberation Mono", "Courier New", monospace;
+}
+
+.markdown-content table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.markdown-content img {
+	max-width: 100%;
+	height: auto;
+}
+
+.markdown-content a {
+	text-decoration: underline;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+	margin-top: 0.5rem;
+	margin-bottom: 0.5rem;
+}

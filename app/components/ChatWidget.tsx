@@ -1,10 +1,13 @@
 'use client'
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useRef, useEffect } from 'react'
 import { X, Minimize2 } from 'lucide-react'
 import { IoChatbubblesOutline } from "react-icons/io5";
 import { GrSend } from "react-icons/gr";
 import Image from 'next/image'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 interface Message {
     id: string
@@ -466,9 +469,52 @@ export default function ChatWidget({
                                                         >
                                                             {message.content || (message.role === 'assistant' && isLoading) ? (
                                                                 message.content ? (
-                                                                    <p className="text-sm font-medium whitespace-pre-wrap break-words">
-                                                                        {message.content}
-                                                                    </p>
+                                                                    message.role === 'assistant' ? (
+                                                                        <div className="text-sm font-medium markdown-content">
+                                                                            <ReactMarkdown
+                                                                                remarkPlugins={[remarkGfm]}
+                                                                                components={{
+                                                                                    p: ({ children, ...props }: any) => <p className="whitespace-pre-wrap break-words mb-4 last:mb-0" {...props}>{children}</p>,
+                                                                                    h1: ({ children, ...props }: any) => <h1 className="text-xl font-bold my-4" {...props}>{children}</h1>,
+                                                                                    h2: ({ children, ...props }: any) => <h2 className="text-lg font-bold my-3" {...props}>{children}</h2>,
+                                                                                    h3: ({ children, ...props }: any) => <h3 className="text-base font-bold my-2" {...props}>{children}</h3>,
+                                                                                    ul: ({ children, ...props }: any) => <ul className="list-disc pl-6 mb-4" {...props}>{children}</ul>,
+                                                                                    ol: ({ children, ...props }: any) => <ol className="list-decimal pl-6 mb-4" {...props}>{children}</ol>,
+                                                                                    li: ({ children, ...props }: any) => <li className="mb-1" {...props}>{children}</li>,
+                                                                                    a: ({ children, ...props }: any) => <a className="text-[#EF8143] underline hover:no-underline" {...props}>{children}</a>,
+                                                                                    code: ({ inline, children, ...props }: any) => {
+                                                                                        return inline
+                                                                                            ? <code className="bg-[#2A2E37] px-1 py-0.5 rounded text-xs" {...props}>{children}</code>
+                                                                                            : <code className="block bg-[#2A2E37] p-2 rounded-md text-xs my-2 overflow-x-auto" {...props}>{children}</code>
+                                                                                    },
+                                                                                    pre: ({ children, ...props }: any) => <pre className="bg-transparent p-0 my-2" {...props}>{children}</pre>,
+                                                                                    blockquote: ({ children, ...props }: any) => <blockquote className="border-l-4 border-[#EF8143] pl-4 italic my-4" {...props}>{children}</blockquote>,
+                                                                                    hr: ({ ...props }: any) => <hr className="my-4 border-[#EF8143]/30" {...props} />,
+                                                                                    table: ({ children, ...props }: any) => <div className="overflow-x-auto my-4"><table className="min-w-full border-collapse" {...props}>{children}</table></div>,
+                                                                                    th: ({ children, ...props }: any) => <th className="border border-[#EF8143]/30 px-2 py-1 bg-[#EF8143]/10" {...props}>{children}</th>,
+                                                                                    td: ({ children, ...props }: any) => <td className="border border-[#EF8143]/30 px-2 py-1" {...props}>{children}</td>
+                                                                                }}
+                                                                            >
+                                                                                {message.content}
+                                                                            </ReactMarkdown>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div className="text-sm font-medium">
+                                                                            <ReactMarkdown
+                                                                                remarkPlugins={[remarkGfm]}
+                                                                                components={{
+                                                                                    p: ({ children, ...props }: any) => <p className="whitespace-pre-wrap break-words" {...props}>{children}</p>,
+                                                                                    code: ({ inline, children, ...props }: any) => {
+                                                                                        return inline
+                                                                                            ? <code className="bg-[#2A2E37] px-1 py-0.5 rounded text-xs" {...props}>{children}</code>
+                                                                                            : <code className="block bg-[#2A2E37] p-2 rounded-md text-xs my-2 overflow-x-auto" {...props}>{children}</code>
+                                                                                    }
+                                                                                }}
+                                                                            >
+                                                                                {message.content}
+                                                                            </ReactMarkdown>
+                                                                        </div>
+                                                                    )
                                                                 ) : (
                                                                     <span className="flex items-center space-x-2">
                                                                         <span className="flex space-x-1">
