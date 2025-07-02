@@ -361,7 +361,7 @@ export default function ChatWidget({
                         height: `${height}px`
                     }}
                 >
-                    <div className="bg-[#151921] rounded-[20px] border border-[#EF8143] shadow-2xl flex flex-col h-full">
+                    <div className="bg-[#151921de] rounded-[20px] border border-[#EF8143] shadow-2xl flex flex-col h-full">
                         <div className="flex items-center justify-between px-4 py-2 border-b border-[#EF8143] flex-shrink-0">
                             <div className="flex items-center">
                                 <button
@@ -386,7 +386,7 @@ export default function ChatWidget({
                                 <Image
                                     src="/logo.svg"
                                     alt="Logo"
-                                    width={80}
+                                    width={120}
                                     height={80}
                                     className="object-contain"
                                 />
