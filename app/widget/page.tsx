@@ -15,12 +15,12 @@ function EmbedContent() {
         showOnScroll: searchParams.get("showOnScroll") !== "false",
         showOnInactivity: searchParams.get("showOnInactivity") !== "false",
         inactivityDelay: Number.parseInt(searchParams.get("inactivityDelay") || "30000"),
-        width: Number.parseInt(searchParams.get("width") || "400"),
+        width: Number.parseInt(searchParams.get("width") || "458"),
         height: Number.parseInt(searchParams.get("height") || "584"),
         chatBoxtitle: searchParams.get("chatBoxtitle") || "Ask AI",
         chatBoxsubTitle: searchParams.get("chatBoxsubTitle") || "powered by OpenAI",
         chatBoxDescription: searchParams.get("chatBoxDescription") || "Get instant answers to your questions",
-        chatBoxInputPlaceholder: searchParams.get("chatBoxInputPlaceholder") || "Type Your Question Here...",
+        chatBoxInputPlaceholder: searchParams.get("chatBoxInputPlaceholder") || "Type your message....",
     }
 
     return <ChatWidget {...props} />

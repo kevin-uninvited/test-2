@@ -50,7 +50,7 @@ export default function ChatWidget({
     width = 400,
     height = 584,
     chatBoxtitle = "Ask AI",
-    chatBoxInputPlaceholder = "Type Your Question Here..."
+    chatBoxInputPlaceholder = "Type your message....."
 }: ChatWidgetProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [isMobile, setIsMobile] = useState(false)
@@ -84,9 +84,9 @@ export default function ChatWidget({
         }
 
         const desktopPositions = {
-            'bottom-right': 'bottom-20 right-4',
-            'bottom-left': 'bottom-20 left-4',
-            'bottom-center': 'bottom-20 left-1/2 transform -translate-x-1/2'
+            'bottom-right': 'bottom-26 right-4',
+            'bottom-left': 'bottom-26 left-4',
+            'bottom-center': 'bottom-26 left-1/2 transform -translate-x-1/2'
         }
 
         return desktopPositions[position]
@@ -326,11 +326,12 @@ export default function ChatWidget({
                         style={{ backgroundColor: brandColor }}
                         aria-label="Open chat"
                     >
-                        <IoChatbubblesOutline size={24} />
+                        <Image src="/sms1.svg" alt="Logo" width={24} height={24} className="object-contain" />
                         {hasScrolled && (
                             <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full"></div>
                         )}
                     </button>
+                    <div className="text-center mt-2 font-medium text-sm text-white">Ask AI</div>
                 </div>
             )}
 
@@ -344,6 +345,7 @@ export default function ChatWidget({
                     >
                         <X size={24} />
                     </button>
+                    <div className="text-center mt-2 font-medium text-sm text-white">Ask AI</div>
                 </div>
             )}
 
@@ -408,9 +410,9 @@ export default function ChatWidget({
                             {messages.length === 0 && (
                                 <div className="absolute inset-0 flex items-center justify-center p-6 pb-20">
                                     <div className="flex flex-col items-center gap-4 text-center max-w-sm">
-                                        <Image src="/message.svg" alt="Logo" width={40} height={40} className="object-contain" />
+                                        <Image src="/message.svg" alt="Logo" width={50} height={50} className="object-contain" />
                                         <h1 className="font-sans text-center relative">
-                                            <span className="block text-[#EF8143] font-bold text-2xl md:text-4xl mb-2">
+                                            <span className="block text-[#EF8143] font-bold text-[60px] md:text-4xl mb-2">
                                                 {chatBoxtitle}
                                                 <span className="absolute -top-1 -right-12 text-xs font-medium bg-[#EF8143]/20 text-[#EF8143] px-1.5 py-0.5 rounded">beta</span>
                                             </span>
