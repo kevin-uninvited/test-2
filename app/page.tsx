@@ -77,9 +77,9 @@ export default function DemoPage() {
             <h2 className="text-2xl font-medium text-white mb-4">How to Integrate</h2>
             <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/50 rounded-xl p-6 text-gray-300">
               <ol className="list-decimal list-inside space-y-3 font-light">
-                <li>Simply add the `script` tag to your HTML file.</li>
+                <li>Simply add the &lsquo;script&rsquo; tag to your HTML file.</li>
                 <li>The widget will automatically be added to your page.</li>
-                <li>There's no need to manually add an `iframe`.</li>
+                <li>There&apos;s no need to manually add an &lsquo;iframe&rsquo;.</li>
               </ol>
             </div>
           </div>
