@@ -41,6 +41,7 @@ export async function POST(request: Request) {
                 async start(controller) {
                     const reader = response.body!.getReader()
                     const decoder = new TextDecoder()
+                    const encoder = new TextEncoder()
                     let buffer = '';
 
                     try {
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
                             if (done) {
                                 // Process any remaining buffer content
                                 if (buffer.trim()) {
-                                    processChunk(buffer, controller);
+                                    processChunk(buffer, controller, encoder);
                                 }
                                 controller.close();
                                 break;
@@ -65,7 +66,7 @@ export async function POST(request: Request) {
                             buffer = lines.pop() || ''; // Keep the last incomplete line in buffer
 
                             for (const line of lines) {
-                                processChunk(line, controller);
+                                processChunk(line, controller, encoder);
                             }
                         }
                     } catch (error) {
@@ -76,7 +77,7 @@ export async function POST(request: Request) {
             });
 
             // Helper function to process a chunk of data
-            function processChunk(line: string, controller: ReadableStreamDefaultController) {
+            function processChunk(line: string, controller: ReadableStreamDefaultController, encoder: TextEncoder) {
                 if (line.startsWith('data: ')) {
                     const data = line.slice(6).trim();
                     if (data === '[DONE]') {
@@ -87,7 +88,8 @@ export async function POST(request: Request) {
                         const parsed = JSON.parse(data);
                         if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta && parsed.choices[0].delta.content) {
                             const content = parsed.choices[0].delta.content;
-                            controller.enqueue(`data: ${JSON.stringify({ content })}\n\n`);
+                            const chunk = `data: ${JSON.stringify({ content })}\n\n`;
+                            controller.enqueue(encoder.encode(chunk));
                         }
                     } catch {
                         // Skip invalid JSON chunks
