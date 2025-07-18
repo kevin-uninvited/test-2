@@ -44,14 +44,15 @@ interface ChatWidgetProps {
 }
 
 export default function ChatWidget({
-    brandColor = '#EF8143',
-    position = 'bottom-right',
+    brandColor: initialBrandColor = '#EF8143',
+    position: initialPosition = 'bottom-right',
     width = 400,
     height = 584,
 }: ChatWidgetProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [isMobile, setIsMobile] = useState(false)
     const [isFullView, setIsFullView] = useState(false)
+    const [wasFullView, setWasFullView] = useState(false) // Track previous fullscreen state
     const [messages, setMessages] = useState<Message[]>([])
     const [inputValue, setInputValue] = useState('')
     const [isLoading, setIsLoading] = useState(false)
@@ -59,15 +60,17 @@ export default function ChatWidget({
     const [questionsLoading, setQuestionsLoading] = useState(true)
     const [askAIData, setAskAIData] = useState<AskAIPageType | null>(null)
     const [askAIDataLoading, setAskAIDataLoading] = useState(true)
+    const [brandColor, setBrandColor] = useState(initialBrandColor)
+    const [position, setPosition] = useState(initialPosition)
 
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
     const chatContainerRef = useRef<HTMLDivElement>(null)
 
     const positionClasses = {
-        'bottom-right': 'bottom-4 right-4',
-        'bottom-left': 'bottom-4 left-4',
-        'bottom-center': 'bottom-4 left-1/2 transform -translate-x-1/2'
+        'bottom-right': 'bottom-0 right-4',
+        'bottom-left': 'bottom-0 left-4',
+        'bottom-center': 'bottom-0 left-1/2 transform -translate-x-1/2'
     }
 
     const getChatClasses = () => {
@@ -255,16 +258,123 @@ export default function ChatWidget({
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
 
+    // Helper function to handle external links
+    const handleExternalLink = (href: string, e: React.MouseEvent) => {
+        // If we're in an iframe, use the parent window to open the link
+        if (window.parent !== window) {
+            e.preventDefault();
+            try {
+                // Send message to parent to open the link
+                window.parent.postMessage({
+                    type: 'EXTERNAL_LINK',
+                    url: href
+                }, '*');
+            } catch (error) {
+                console.error('Error posting message to parent:', error);
+                // Fallback: try to open directly
+                window.open(href, '_blank', 'noopener,noreferrer');
+            }
+        }
+        // If not in an iframe, the default target="_blank" behavior will work
+    };
+
+    // Listen for configuration updates from the parent window
+    useEffect(() => {
+        const handleConfigMessage = (event: MessageEvent) => {
+            // Add appropriate origin checks for security
+            if (event.data && event.data.type === 'CHAT_WIDGET_CONFIG') {
+                const config = event.data.config;
+
+                // Apply configuration changes
+                if (config.brandColor) {
+                    // Update brand color
+                    setBrandColor(config.brandColor);
+                }
+
+                // Handle other configuration options as needed
+                if (config.position) {
+                    // Update position
+                    setPosition(config.position);
+                }
+            }
+        };
+
+        window.addEventListener('message', handleConfigMessage);
+
+        return () => {
+            window.removeEventListener('message', handleConfigMessage);
+        };
+    }, []);
+
+    // Notify parent window when chat is closed
+    const handleClose = () => {
+        // Store the fullscreen state before closing
+        setWasFullView(isFullView);
+        setIsOpen(false);
+
+        // Send message to parent window
+        if (typeof window !== 'undefined') {
+            try {
+                window.parent.postMessage({
+                    type: 'CHAT_WIDGET_CLOSE',
+                    value: true,
+                    wasFullscreen: isFullView // Send fullscreen state to parent
+                }, '*');
+            } catch (error) {
+                console.error('Error posting message to parent:', error);
+            }
+        }
+    };
+
     const toggleFullView = () => {
         setIsFullView(!isFullView)
+
+        // Send message to parent window to toggle fullscreen if in iframe
+        if (typeof window !== 'undefined') {
+            try {
+                window.parent.postMessage({
+                    type: 'CHAT_WIDGET_FULLSCREEN',
+                    value: !isFullView
+                }, '*');
+            } catch (error) {
+                console.error('Error posting message to parent:', error);
+            }
+        }
     }
+
+    // Notify parent window when chat is opened
+    useEffect(() => {
+        if (isOpen && typeof window !== 'undefined') {
+            try {
+                window.parent.postMessage({
+                    type: 'CHAT_WIDGET_OPEN',
+                    value: true,
+                    fullscreen: isFullView || wasFullView // Tell parent if we should be in fullscreen mode
+                }, '*');
+
+                // If we need to restore fullscreen mode
+                if (wasFullView) {
+                    setIsFullView(true);
+                    setWasFullView(false); // Reset the wasFullView flag
+                }
+            } catch (error) {
+                console.error('Error posting message to parent:', error);
+            }
+        }
+    }, [isOpen, isFullView, wasFullView]);
 
     return (
         <>
             {!isOpen && (
                 <div className={`fixed ${positionClasses[position]} z-50`}>
                     <button
-                        onClick={() => setIsOpen(true)}
+                        onClick={() => {
+                            setIsOpen(true);
+                            // Restore fullscreen state if it was in fullscreen before closing
+                            if (wasFullView) {
+                                setIsFullView(true);
+                            }
+                        }}
                         className={`relative text-black p-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-orange-300`}
                         style={{ backgroundColor: brandColor }}
                         aria-label="Open chat"
@@ -284,7 +394,7 @@ export default function ChatWidget({
             {isOpen && !isFullView && (
                 <div className={`fixed ${positionClasses[position]} z-[60]`}>
                     <button
-                        onClick={() => setIsOpen(false)}
+                        onClick={handleClose}
                         className="text-black p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-orange-300"
                         style={{ backgroundColor: brandColor }}
                         aria-label="Close chat"
@@ -304,7 +414,7 @@ export default function ChatWidget({
             {isOpen && (
                 <div
                     className={`fixed ${getChatClasses()} ${isFullView ? 'z-[100]' : 'z-50'}`}
-                    style={isFullView ? { width: '100vw', height: '100vh' } : isMobile ? { width: 'calc(100vw - 2rem)', height: 'calc(92vh - 2rem)' } : { width: `${width}px`, height: `${height}px` }}
+                    style={isFullView ? { width: '100vw', height: '100vh' } : isMobile ? { width: 'calc(100vw - 2rem)', height: 'calc(91vh - 2rem)' } : { width: `${width}px`, height: `${height}px` }}
                 >
                     <div className="bg-[#151921de] rounded-[20px] border border-[#EF8143] shadow-2xl flex flex-col h-full chat-widget-container">
                         <div className="flex items-center justify-between px-4 py-2 border-b border-[#EF8143] flex-shrink-0">
@@ -317,7 +427,7 @@ export default function ChatWidget({
                                 </button>
                             </div>
                             <Image src="/logo.svg" alt="Logo" width={120} height={80} className="object-contain" />
-                            {isFullView ? <button onClick={() => setIsOpen(false)} className="hover:bg-[#EF8143]/20 rounded-lg p-1 transition-colors"><X size={20} className="text-white" /></button> : <div className="w-6" />}
+                            {isFullView ? <button onClick={handleClose} className="hover:bg-[#EF8143]/20 rounded-lg p-1 transition-colors"><X size={20} className="text-white" /></button> : <div className="w-6" />}
                         </div>
 
                         <div className="flex-1 flex flex-col min-h-0 relative">
@@ -367,7 +477,18 @@ export default function ChatWidget({
                                                                                 ul: ({ children, ...props }: any) => <ul className="list-disc pl-6 mb-4" {...props}>{children}</ul>,
                                                                                 ol: ({ children, ...props }: any) => <ol className="list-decimal pl-6 mb-4" {...props}>{children}</ol>,
                                                                                 li: ({ children, ...props }: any) => <li className="mb-1" {...props}>{children}</li>,
-                                                                                a: ({ children, ...props }: any) => <a className="text-[#EF8143] underline hover:no-underline" {...props}>{children}</a>,
+                                                                                a: ({ children, href, ...props }: any) => (
+                                                                                    <a
+                                                                                        className="text-[#EF8143] underline hover:no-underline"
+                                                                                        href={href}
+                                                                                        target="_blank"
+                                                                                        rel="noopener noreferrer"
+                                                                                        onClick={(e) => handleExternalLink(href as string, e)}
+                                                                                        {...props}
+                                                                                    >
+                                                                                        {children}
+                                                                                    </a>
+                                                                                ),
                                                                                 code: ({ inline, children, ...props }: any) => {
                                                                                     return inline
                                                                                         ? <code className="bg-[#2A2E37] px-1 py-0.5 rounded text-xs" {...props}>{children}</code>
@@ -390,6 +511,18 @@ export default function ChatWidget({
                                                                             remarkPlugins={[remarkGfm]}
                                                                             components={{
                                                                                 p: ({ children, ...props }: any) => <p className="whitespace-pre-wrap break-words" {...props}>{children}</p>,
+                                                                                a: ({ children, href, ...props }: any) => (
+                                                                                    <a
+                                                                                        className="text-[#EF8143] underline hover:no-underline"
+                                                                                        href={href}
+                                                                                        target="_blank"
+                                                                                        rel="noopener noreferrer"
+                                                                                        onClick={(e) => handleExternalLink(href as string, e)}
+                                                                                        {...props}
+                                                                                    >
+                                                                                        {children}
+                                                                                    </a>
+                                                                                ),
                                                                                 code: ({ inline, children, ...props }: any) => {
                                                                                     return inline
                                                                                         ? <code className="bg-[#2A2E37] px-1 py-0.5 rounded text-xs" {...props}>{children}</code>

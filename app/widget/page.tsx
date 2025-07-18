@@ -1,37 +1,21 @@
 "use client"
-
-import { Suspense } from "react"
-import { useSearchParams } from "next/navigation"
+import { useEffect } from "react"
 import ChatWidget from "../components/ChatWidget"
 
-function EmbedContent() {
-    const searchParams = useSearchParams()
-
-    const props = {
-        brandColor: searchParams.get("brandColor") || "#EF8143",
-        logo: searchParams.get("logo") || undefined,
-        welcomeMessage: searchParams.get("welcomeMessage") || "Hi! How can I help you today?",
-        position: (searchParams.get("position") as "bottom-right" | "bottom-left" | "bottom-center") || "bottom-right",
-        showOnScroll: searchParams.get("showOnScroll") !== "false",
-        showOnInactivity: searchParams.get("showOnInactivity") !== "false",
-        inactivityDelay: Number.parseInt(searchParams.get("inactivityDelay") || "30000"),
-        width: Number.parseInt(searchParams.get("width") || "458"),
-        height: Number.parseInt(searchParams.get("height") || "584"),
-        chatBoxtitle: searchParams.get("chatBoxtitle") || "Ask AI",
-        chatBoxsubTitle: searchParams.get("chatBoxsubTitle") || "powered by OpenAI",
-        chatBoxDescription: searchParams.get("chatBoxDescription") || "Get instant answers to your questions",
-        chatBoxInputPlaceholder: searchParams.get("chatBoxInputPlaceholder") || "Type your message....",
-    }
-
-    return <ChatWidget {...props} />
-}
-
 export default function EmbedPage() {
+    useEffect(() => {
+        // Set title for the iframe page
+        document.title = "Chat Widget";
+
+        // Ensure this page works well in an iframe
+        if (window.parent !== window) {
+            console.log("Running in iframe mode");
+        }
+    }, []);
+
     return (
-        <div className="min-h-screen bg-transparent">
-            <Suspense fallback={<div>Loading...</div>}>
-                <EmbedContent />
-            </Suspense>
+        <div className="h-screen w-screen bg-transparent">
+            <ChatWidget />
         </div>
     )
 }
