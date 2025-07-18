@@ -1,6 +1,6 @@
 # CTT Chat Widget
 
-A sleek, responsive floating chat widget designed for seamless integration across multiple websites. The widget is hosted centrally and embedded into client sites via iframe, requiring no complex setup.
+A sleek, responsive floating chat widget designed for seamless integration across multiple websites. The widget is hosted centrally and embedded into client sites via a simple script tag, requiring no complex setup.
 
 ## Features
 
@@ -8,7 +8,7 @@ A sleek, responsive floating chat widget designed for seamless integration acros
 - **Customizable Branding**: Colors, logo, welcome message, and positioning
 - **Smart Behavior**: Auto-triggers on scroll, inactivity detection
 - **Responsive Design**: Works perfectly on desktop, tablet, and mobile
-- **Easy Integration**: Simple iframe or script tag embedding
+- **Easy Integration**: Simple script tag embedding
 - **Cross-platform**: Compatible with any website or platform
 - **Dynamic Chat Questions**: AI-powered suggested questions from Sanity CMS
 - **Full-View Mode**: Expandable interface for enhanced user experience
@@ -53,34 +53,28 @@ npm run dev
 
 Visit `http://localhost:3000` to see the widget demo.
 
-## Integration Methods
+## Integration
 
-### Method 1: Script Tag (Recommended)
-
-Add this to your website's HTML:
+Add this script to your website's HTML:
 
 ```html
-<script>
-	window.ChatWidgetConfig = {
-		baseUrl: "https://your-widget-domain.com",
-		brandColor: "#EF8143",
-		welcomeMessage: "Hi! How can I help you today?",
-		chatBoxtitle: "Ask AI",
-		position: "bottom-right",
-	};
-</script>
-<script src="https://your-widget-domain.com/embed.js"></script>
+<script
+	src="http://localhost:3000/embed.js"
+	data-source="http://localhost:3000/widget"
+	async
+	defer
+></script>
 ```
 
-### Method 2: Direct Iframe
-
-Embed the widget directly:
+For production, replace `localhost:3000` with your deployed domain:
 
 ```html
-<iframe
-	src="https://your-widget-domain.com/widget?brandColor=%23EF8143&chatBoxtitle=Ask%20AI"
-	style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 9999; pointer-events: none; background: transparent;"
-></iframe>
+<script
+	src="https://your-widget-domain.com/embed.js"
+	data-source="https://your-widget-domain.com/widget"
+	async
+	defer
+></script>
 ```
 
 ## Customization Options
@@ -103,40 +97,7 @@ Embed the widget directly:
 | `chatBoxDescription`      | string  | `Get instant answers...`        | Description text in chat interface                               |
 | `chatBoxInputPlaceholder` | string  | `Type Your Question Here...`    | Placeholder text for input field                                 |
 
-### Example Configurations
 
-**E-commerce Store:**
-
-```javascript
-window.ChatWidgetConfig = {
-	baseUrl: "https://your-widget-domain.com",
-	brandColor: "#FF6B6B",
-	logo: "https://your-store.com/logo.png",
-	welcomeMessage: "Welcome to our store! Need help finding something?",
-	chatBoxtitle: "Shop Assistant",
-	chatBoxsubTitle: "powered by AI",
-	showOnScroll: true,
-	inactivityDelay: 20000,
-	width: 450,
-	height: 600,
-};
-```
-
-**SaaS Platform:**
-
-```javascript
-window.ChatWidgetConfig = {
-	baseUrl: "https://your-widget-domain.com",
-	brandColor: "#10B981",
-	welcomeMessage: "Hi! Need help with our platform?",
-	chatBoxtitle: "Support Chat",
-	position: "bottom-left",
-	showOnInactivity: true,
-	inactivityDelay: 45000,
-	chatBoxInputPlaceholder:
-		"Ask about features, pricing, or technical issues...",
-};
-```
 
 ## API Endpoints
 
@@ -189,7 +150,7 @@ Fetches dynamic chat questions from Sanity CMS.
 │   │   ├── chat/route.ts              # Chat API endpoint with streaming
 │   │   └── chat-questions/route.ts     # Dynamic questions from Sanity
 │   ├── components/ChatWidget.tsx       # Main widget component
-│   ├── widget/                        # Widget iframe page
+│   ├── widget/                        # Widget page
 │   │   ├── page.tsx
 │   │   └── layout.tsx
 │   ├── page.tsx                       # Demo/documentation page
@@ -318,7 +279,7 @@ Test the widget on different sites:
 
 1. Visit `/demo.html` for a standalone demo
 2. Use browser dev tools to test responsive behavior
-3. Test iframe integration on external sites
+3. Test script integration on external sites
 4. Verify full-view mode functionality
 5. Test dynamic question loading
 
@@ -332,7 +293,7 @@ Test the widget on different sites:
 ## Security Considerations
 
 - API keys are server-side only
-- CORS configured for iframe embedding
+- CORS configured for widget embedding
 - Content Security Policy friendly
 - No client-side API key exposure
 - Sanity tokens secured server-side

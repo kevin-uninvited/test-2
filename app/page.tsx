@@ -16,24 +16,18 @@ declare global {
 export default function DemoPage() {
   const [mounted, setMounted] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [origin, setOrigin] = useState('')
 
   useEffect(() => {
     setMounted(true)
+    setOrigin(window.location.origin)
   }, [])
 
   // The new embed code using a script tag.
-  const embedCode = `<script src="http://localhost:3001/embed.js"></script>
-
-<script>
-  // Wait for widget to load
-  setTimeout(() => {
-    // Set widget position
-    window.ChatWidgetConfig.setPosition('bottom-left');
-    
-    // Set brand color
-    window.ChatWidgetConfig.setBrandColor('#FF5500');
-  }, 1000);
-</script>`
+  const embedCode = `<script src="${origin}/embed.js"
+          data-source="${origin}/widget"
+          async
+          defer></script>`
 
   const handleCopy = async () => {
     try {
@@ -45,8 +39,7 @@ export default function DemoPage() {
     }
   }
 
-  // Handlers for the live demo control buttons.
-  // Optional chaining (?.) is used in case the script hasn't loaded yet.
+
   const handleSetPosition = (position: string) => {
     window.ChatWidgetConfig?.setPosition(position)
   }
@@ -150,7 +143,13 @@ export default function DemoPage() {
 
       {/* Include the widget script for the live demo on this page. */}
       {/* It will load after the page is interactive. */}
-      <Script src="http://localhost:3001/embed.js" data-source="http://localhost:3001/widget" strategy="lazyOnload" />
+      {mounted && (
+        <Script
+          src={`${origin}/embed.js`}
+          data-source={`${origin}/widget`}
+          strategy="lazyOnload"
+        />
+      )}
     </>
   )
 }

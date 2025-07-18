@@ -46,6 +46,26 @@ iframe[style*="pointer-events: none"] * {
 	pointer-events: auto;
 }
 
+/* Chat widget animation improvements */
+.chat-widget-container {
+	transform-origin: bottom right;
+	will-change: transform, opacity;
+}
+
+.chat-widget-container.bottom-left {
+	transform-origin: bottom left;
+}
+
+.chat-widget-container.bottom-center {
+	transform-origin: bottom center;
+}
+
+/* Smooth animations for all transitions */
+* {
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+}
+
 /* Markdown content styles */
 .markdown-content {
 	word-break: break-word;
